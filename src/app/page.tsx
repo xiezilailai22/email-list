@@ -1,116 +1,19 @@
-'use client';
-
-import { useState } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { SubscribeForm } from "@/components/subscribe-form"
 
 export default function Home() {
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !email.includes('@')) {
-      toast.error('请输入有效的邮箱地址');
-      return;
-    }
-
-    setIsLoading(true);
-    const submitPromise = fetch('/api/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    }).then(async (response) => {
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || '提交失败');
-      }
-      setEmail('');
-      return '订阅成功！';
-    });
-
-    toast.promise(submitPromise, {
-      loading: '正在提交...',
-      success: (message) => message,
-      error: (err) => err.message,
-    });
-
-    try {
-      await submitPromise;
-    } catch {
-      // 错误已经被 toast 处理
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[hsl(var(--background))] to-[hsl(var(--accent))]">
-      <Toaster position="top-center" />
-      
-      <main className="flex-grow flex items-center justify-center p-4 sm:p-8">
-        <div className="w-full max-w-md transform transition-all duration-500 hover:scale-[1.01]">
-          <div className="backdrop-blur-xl bg-white/80 rounded-2xl shadow-2xl p-8 space-y-8 border border-[hsl(var(--border))]">
-            <div className="space-y-4">
-              <h1 className="text-4xl sm:text-5xl font-bold text-center bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--secondary))] bg-clip-text text-transparent">
-                邮件列表订阅
-              </h1>
-              <p className="text-center text-[hsl(var(--muted-foreground))] text-lg">
-                订阅我们的邮件列表以获取最新更新
-              </p>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="relative group">
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  disabled={isLoading}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="请输入您的邮箱地址"
-                  className="transition-all duration-300 focus:scale-[1.02]"
-                />
-              </div>
-              
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-12 text-lg transition-all duration-300 hover:scale-[1.02] bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--secondary))] hover:opacity-90"
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    提交中...
-                  </span>
-                ) : '立即订阅'}
-              </Button>
-            </form>
-          </div>
+    <div className="container flex h-screen w-full flex-col items-center justify-center">
+      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+        <div className="flex flex-col space-y-2 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            订阅我们的邮件列表
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            输入您的邮箱地址以接收最新更新
+          </p>
         </div>
-      </main>
-      
-      <footer className="py-6 backdrop-blur-xl bg-white/50 border-t border-[hsl(var(--border))]">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center justify-center space-y-2">
-            <p className="text-sm text-[hsl(var(--muted-foreground))]">
-              © {new Date().getFullYear()} 邮件列表. 保留所有权利.
-            </p>
-            <p className="text-xs text-[hsl(var(--muted-foreground))] opacity-75">
-              我们承诺保护您的隐私和个人信息
-            </p>
-          </div>
-        </div>
-      </footer>
+        <SubscribeForm />
+      </div>
     </div>
-  );
+  )
 }
