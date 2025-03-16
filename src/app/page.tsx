@@ -39,7 +39,7 @@ export default function Home() {
 
     try {
       await submitPromise;
-    } catch (error) {
+    } catch {
       // 错误已经被 toast 处理
     } finally {
       setIsLoading(false);

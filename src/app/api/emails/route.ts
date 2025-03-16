@@ -19,7 +19,8 @@ async function checkConnection() {
   try {
     await prisma.$queryRaw`SELECT 1`;
     return true;
-  } catch (e) {
+  } catch {
+    // 不需要使用错误参数
     return false;
   }
 }
@@ -47,20 +48,24 @@ export async function POST(request: Request) {
         data: { email },
       });
       return NextResponse.json(newSubscriber, { status: 201 });
-    } catch (error: any) {
-      if (error.code === 'P2002') {
+    } catch (error) {
+      // 检查是否是唯一约束错误
+      if (
+        error instanceof Error &&
+        'code' in error &&
+        error.code === 'P2002'
+      ) {
         return NextResponse.json(
           { error: '该邮箱已经订阅过了' },
           { status: 400 }
         );
       }
-      throw error; // 抛出其他错误
+      throw error;
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error('Subscription error:', error);
     
-    // 根据错误类型返回不同的错误信息
-    if (error.message?.includes('connect')) {
+    if (error instanceof Error && error.message?.includes('connect')) {
       return NextResponse.json(
         { error: '服务暂时不可用，请稍后重试' },
         { status: 503 }
