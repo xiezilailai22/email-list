@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { Navbar } from '@/components/navbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -50,17 +49,16 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <div className="min-h-screen flex flex-col bg-white">
       <Toaster position="top-center" />
       
       <main className="flex-grow flex items-center justify-center p-4">
         <div className="max-w-md w-full space-y-8">
           <div>
-            <h1 className="text-4xl font-bold text-center">
+            <h1 className="text-4xl font-bold text-center text-gray-900">
               邮件列表订阅
             </h1>
-            <p className="mt-2 text-center text-muted-foreground">
+            <p className="mt-2 text-center text-gray-600">
               订阅我们的邮件列表以获取最新更新
             </p>
           </div>
@@ -76,13 +74,14 @@ export default function Home() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="请输入您的邮箱地址"
+                className="placeholder:text-gray-500"
               />
             </div>
             
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
             >
               {isLoading ? (
                 <span className="flex items-center">
@@ -98,13 +97,13 @@ export default function Home() {
         </div>
       </main>
       
-      <footer className="py-6 border-t">
+      <footer className="py-6 border-t bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center justify-center space-y-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-600">
               © {new Date().getFullYear()} 邮件列表. 保留所有权利.
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-gray-500">
               我们承诺保护您的隐私和个人信息
             </p>
           </div>
