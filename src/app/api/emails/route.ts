@@ -19,7 +19,7 @@ async function checkConnection() {
   try {
     await prisma.$queryRaw`SELECT 1`;
     return true;
-  } catch (_error) {
+  } catch {
     return false;
   }
 }
