@@ -1,28 +1,8 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-// 使用连接池
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL
-    },
-  },
-  log: ['error'],
-});
-
-// 预热连接
-prisma.$connect().catch(console.error);
-
-// 健康检查函数
-async function checkConnection() {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    return true;
-  } catch {
-    return false;
-  }
-}
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
@@ -33,13 +13,6 @@ export async function POST(request: Request) {
         { error: '无效的邮箱地址' },
         { status: 400 }
       );
-    }
-
-    // 检查连接状态
-    const isConnected = await checkConnection();
-    if (!isConnected) {
-      // 如果连接断开，尝试重新连接
-      await prisma.$connect();
     }
 
     try {
