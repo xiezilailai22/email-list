@@ -1,42 +1,46 @@
 'use client';
 
 import { useState } from 'react';
-import Image from "next/image";
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function Home() {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [status, setStatus] = useState<'success' | 'error' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !email.includes('@')) {
+      toast.error('请输入有效的邮箱地址');
+      return;
+    }
+
     setIsLoading(true);
-    setMessage('');
-    setStatus(null);
+    const submitPromise = fetch('/api/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    }).then(async (response) => {
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || '提交失败');
+      }
+      setEmail('');
+      return '订阅成功！';
+    });
+
+    toast.promise(submitPromise, {
+      loading: '正在提交...',
+      success: (message) => message,
+      error: (err) => err.message,
+    });
 
     try {
-      const response = await fetch('/api/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage('邮箱添加成功！');
-        setStatus('success');
-        setEmail('');
-      } else {
-        setMessage(data.error || '添加失败，请重试');
-        setStatus('error');
-      }
+      await submitPromise;
     } catch (error) {
-      setMessage('网络连接失败，请检查网络后重试');
-      setStatus('error');
+      // 错误已经被 toast 处理
     } finally {
       setIsLoading(false);
     }
@@ -44,6 +48,26 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          success: {
+            style: {
+              background: '#10B981',
+              color: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#EF4444',
+              color: 'white',
+            },
+            duration: 4000,
+          },
+        }}
+      />
+      
       <main className="flex-grow flex items-center justify-center p-4">
         <div className="max-w-md w-full space-y-8">
           <div>
@@ -73,18 +97,6 @@ export default function Home() {
               />
             </div>
             
-            {message && (
-              <div
-                className={`rounded-md p-4 ${
-                  status === 'success'
-                    ? 'bg-green-50 text-green-800'
-                    : 'bg-red-50 text-red-800'
-                }`}
-              >
-                <p className="text-sm font-medium">{message}</p>
-              </div>
-            )}
-            
             <div>
               <button
                 type="submit"
@@ -97,7 +109,7 @@ export default function Home() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    处理中...
+                    提交中...
                   </span>
                 ) : '订阅'}
               </button>

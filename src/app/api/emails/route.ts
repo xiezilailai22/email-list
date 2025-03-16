@@ -8,9 +8,11 @@ const prisma = new PrismaClient({
       url: process.env.DATABASE_URL
     },
   },
-  // 添加连接重试
-  log: ['error', 'warn'],
+  log: ['error'],
 });
+
+// 预热连接
+prisma.$connect().catch(console.error);
 
 // 健康检查函数
 async function checkConnection() {
